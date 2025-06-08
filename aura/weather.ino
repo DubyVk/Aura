@@ -28,7 +28,7 @@
 SPIClass touchscreenSPI = SPIClass(VSPI);
 XPT2046_Touchscreen touchscreen(XPT2046_CS, XPT2046_IRQ);
 uint32_t draw_buf[DRAW_BUF_SIZE / 4];
-static const char *weekdays[] = {"Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"};
+static const char *weekdays[] = {"Ned", "Pon", "Uto", "Sri", "Čet", "Pet", "Sub"};
 int x, y, z;
 
 // Preferences
@@ -365,7 +365,7 @@ void create_ui() {
   lv_obj_align(lbl_today_feels_like, LV_ALIGN_TOP_MID, 45, 75);
 
   lbl_forecast = lv_label_create(scr);
-  lv_label_set_text(lbl_forecast, "SEVEN DAY FORECAST");
+  lv_label_set_text(lbl_forecast, "TJEDNA PROGNOZA");
   lv_obj_set_style_text_font(lbl_forecast, &lv_font_montserrat_12, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_color(lbl_forecast, lv_color_hex(0xe4ffff), LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_align(lbl_forecast, LV_ALIGN_TOP_LEFT, 20, 110);
@@ -519,7 +519,7 @@ void screen_event_cb(lv_event_t *e) {
 
 void daily_cb(lv_event_t *e) {
   lv_obj_add_flag(box_daily, LV_OBJ_FLAG_HIDDEN);
-  lv_label_set_text(lbl_forecast, "HOURLY FORECAST");
+  lv_label_set_text(lbl_forecast, "PROGNOZA PO SATU");
   lv_obj_clear_flag(box_hourly, LV_OBJ_FLAG_HIDDEN);
 }
 
@@ -644,7 +644,7 @@ void create_settings_window() {
   if (settings_win) return;
 
   settings_win = lv_win_create(lv_scr_act());
-  lv_obj_t *title = lv_win_add_title(settings_win, "Aura Settings");
+  lv_obj_t *title = lv_win_add_title(settings_win, "Aura Postavke");
   lv_obj_set_style_text_font(title, &lv_font_montserrat_20, 0);
   lv_obj_set_style_margin_left(title, 10, 0);
 
@@ -655,11 +655,11 @@ void create_settings_window() {
 
   // Brightness
   lv_obj_t *lbl_b = lv_label_create(cont);
-  lv_label_set_text(lbl_b, "Brightness:");
+  lv_label_set_text(lbl_b, "Svjetlina:");
   lv_obj_align(lbl_b, LV_ALIGN_TOP_LEFT, 0, 10);
   lv_obj_t *slider = lv_slider_create(cont);
   lv_slider_set_range(slider, 10, 255);
-  uint32_t saved_b = prefs.getUInt("brightness", 128);
+  uint32_t saved_b = prefs.getUInt("Svjetlina", 128);
   lv_slider_set_value(slider, saved_b, LV_ANIM_OFF);
   lv_obj_set_width(slider, 100);
   lv_obj_align_to(slider, lbl_b, LV_ALIGN_OUT_RIGHT_MID, 10, 0);
@@ -668,11 +668,11 @@ void create_settings_window() {
     lv_obj_t *s = (lv_obj_t*)lv_event_get_target(e);
     uint32_t v = lv_slider_get_value(s);
     analogWrite(LCD_BACKLIGHT_PIN, v);
-    prefs.putUInt("brightness", v);
+    prefs.putUInt("Svjetlina", v);
   }, LV_EVENT_VALUE_CHANGED, NULL);
 
   lv_obj_t *lbl_loc_l = lv_label_create(cont);
-  lv_label_set_text(lbl_loc_l, "Location:");
+  lv_label_set_text(lbl_loc_l, "Lokacija:");
   lv_obj_align(lbl_loc_l, LV_ALIGN_TOP_LEFT, 0, 85);
 
   lbl_loc = lv_label_create(cont);
@@ -684,7 +684,7 @@ void create_settings_window() {
   lv_obj_set_size(btn_change_loc, 100, 40);
   lv_obj_add_event_cb(btn_change_loc, change_location_event_cb, LV_EVENT_CLICKED, NULL);
   lv_obj_t *lbl_chg = lv_label_create(btn_change_loc);
-  lv_label_set_text(lbl_chg, "Location");
+  lv_label_set_text(lbl_chg, "Lokacija");
   lv_obj_center(lbl_chg);
 
   lv_obj_t *lbl_u = lv_label_create(cont);
@@ -823,7 +823,7 @@ void fetch_and_update_weather() {
 
       char unit = use_fahrenheit ? 'F' : 'C';
       lv_label_set_text_fmt(lbl_today_temp, "%.0f°%c", t_now, unit);
-      lv_label_set_text_fmt(lbl_today_feels_like, "Feels Like %.0f°%c", t_ap, unit);
+      lv_label_set_text_fmt(lbl_today_feels_like, "Osjećaj %.0f°%c", t_ap, unit);
       lv_img_set_src(img_today_icon, choose_image(code_now, is_day));
 
       JsonArray times = doc["daily"]["time"].as<JsonArray>();
@@ -837,7 +837,7 @@ void fetch_and_update_weather() {
         int mon = atoi(date + 5);
         int dayd = atoi(date + 8);
         int dow = day_of_week(year, mon, dayd);
-        const char *dayStr = (i == 0) ? "Today" : weekdays[dow];
+        const char *dayStr = (i == 0) ? "Danas" : weekdays[dow];
 
         float mn = tmin[i].as<float>();
         float mx = tmax[i].as<float>();
@@ -871,7 +871,7 @@ void fetch_and_update_weather() {
         }
 
         if (i == 0) {
-          lv_label_set_text(lbl_hourly[i], "Now");
+          lv_label_set_text(lbl_hourly[i], "Sada");
         } else {
           lv_label_set_text(lbl_hourly[i], hour_name.c_str());
         }
